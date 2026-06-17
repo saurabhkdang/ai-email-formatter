@@ -1,0 +1,3 @@
+ollama 
+mysql-connector-python 
+pydantic
