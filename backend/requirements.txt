@@ -1,3 +1,5 @@
 ollama 
 mysql-connector-python 
 pydantic
+fastapi 
+uvicorn

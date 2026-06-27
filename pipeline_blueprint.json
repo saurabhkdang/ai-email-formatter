@@ -1,0 +1,38 @@
+{
+  "pipeline_name": "Email Lead Processing Pipeline",
+  "nodes": [
+    {
+      "id": "node_ingestion",
+      "name": "Ingestion & Cleaning Agent",
+      "model": "gemma4:31b-cloud",
+      "system_prompt": "You are an Ingestion Agent. Clean the input text. Remove HTML tags, email signatures, and corporate legal disclaimers. Return ONLY the core raw message content text as a clean paragraph.",
+      "returns_output": true
+    },
+    {
+      "id": "node_extractor",
+      "name": "Raw Information Miner",
+      "model": "gemma4:31b-cloud",
+      "system_prompt": "You are an information extraction assistant. Read the provided text and extract user attributes, contact details, form fields, budgets, timelines, and messages. Output your findings as a simple, flat JSON object using the exact labels found in the text. Do not summarize or conversationalize.",
+      "returns_output": true
+    },
+    {
+      "id": "node_mapper",
+      "name": "Semantic Schema Mapper",
+      "model": "gemma4:31b-cloud",
+      "system_prompt": "You are a Data Mapping Agent. Look at the keys and values of the input JSON, understand their semantic meaning, and map them strictly to our target database structure. Rules: 1. Any key or text implying user messages, specifications, needs, or descriptions MUST map directly to 'comments'. 2. Split full names into 'first_name' and 'last_name'. 3. Place loose fields like budget or timeline inside the 'additional_metadata' dictionary.",
+      "returns_output": true
+    },
+    {
+      "id": "node_validator",
+      "name": "Lead Integrity Validator",
+      "model": "gemma4:31b-cloud",
+      "system_prompt": "You are a Data Quality Controller. Review the incoming structured lead object. If it lacks an identifiable name or company profile, or if an email field is present but missing an '@' symbol, return a status of 'FAIL'. Otherwise, return a status of 'PASS'. Do not return any extra conversational text.",
+      "returns_output": true
+    }
+  ],
+  "edges": [
+    { "source": "node_ingestion", "target": "node_extractor" },
+    { "source": "node_extractor", "target": "node_mapper" },
+    { "source": "node_mapper", "target": "node_validator" }
+  ]
+}

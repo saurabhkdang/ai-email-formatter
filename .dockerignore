@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+node_modules/
+
+.git
+
+.env
+
+frontend/node_modules
